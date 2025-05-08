@@ -21,6 +21,7 @@
     if ($_GET["ruta"] == "inicio" ||
         $_GET["ruta"] == "Servicios"||
         $_GET["ruta"] == "loginClientes"||
+        $_GET["ruta"] == "registro"||
         $_GET["ruta"] == "contact"||
         $_GET["ruta"] == "reservacion"||
         $_GET["ruta"] == "inicio"
