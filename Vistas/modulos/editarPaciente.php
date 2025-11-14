@@ -165,7 +165,7 @@ if (isset($_POST['guardar'])) {
           </div>
         </div>
 
-        <!-- PANEL RESUMEN -->
+        <!-- PANEL RESUMEN NUEVO ARCHIVO -->
         <div class="col-md-4">
           <div class="card shadow">
             <div class="card-body">

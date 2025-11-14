@@ -1,6 +1,6 @@
 <?php
 include 'conexion.php';
-
+/* NUEVO ARCHIVO */
 $id = $_GET['id'] ?? 0;
 $paciente_id = $_GET['paciente_id'] ?? 0;
 
