@@ -4,7 +4,7 @@ $servidor = "localhost";
 $usuario = "root";
 $clave = "";
 $bd = "sistemacitas";
-$enlace = mysqli_connect($servidor, $usuario, $clave, $bd);
+$enlace = mysqli_connect($servidor, $usuario, $clave, $bd, 3307);
 
 if (!$enlace) {
     die("Error de conexión: " . mysqli_connect_error());
@@ -55,7 +55,7 @@ if (!$enlace) {
                 </div>
               </form>
 
-              <a href="index.php" class="text-center d-block mt-3">Ya tengo una cuenta</a>
+              <a href="loginClientes" class="text-center d-block mt-3">Ya tengo una cuenta</a>
             </div>
           </div>
         </div>
@@ -70,6 +70,14 @@ if (isset($_POST['registrar'])) {
     $correo = mysqli_real_escape_string($enlace, $_POST['correo']);
     $usuario = mysqli_real_escape_string($enlace, $_POST['usuario']);
     $contraseña = mysqli_real_escape_string($enlace, $_POST['contraseña']);
+
+    // Validar correo electrónico
+    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        echo "<script>alert('El correo electrónico no es válido.'); window.location='http://127.0.0.1/MVC/index.php?ruta=registro';</script>";
+        exit();
+    }
+
+    // Contraseña se permite con caracteres especiales y sin restricciones de formato
     $password_encriptada = password_hash($contraseña, PASSWORD_DEFAULT);
 
     // Verificar si el usuario ya existe
@@ -77,7 +85,7 @@ if (isset($_POST['registrar'])) {
     $resultado_verificacion = mysqli_query($enlace, $verificar_usuario);
 
     if (mysqli_num_rows($resultado_verificacion) > 0) {
-        echo "<script>alert('El usuario ya existe'); window.location='index.php';</script>";
+        echo "<script>alert('El usuario ya existe'); window.location='http://127.0.0.1/MVC/index.php?ruta=registro';</script>";
     } else {
         // Insertar nuevo usuario
         $sql = "INSERT INTO usuarios (Nombre, Correo, usuario, password) 
@@ -85,7 +93,7 @@ if (isset($_POST['registrar'])) {
         $resultado = mysqli_query($enlace, $sql);
 
         if ($resultado) {
-            echo "<script>alert('Registro exitoso'); window.location='index.php';</script>";
+            echo "<script>alert('Registro exitoso'); window.location='loginClientes';</script>";
         } else {
             echo "<script>alert('Error al registrar');</script>";
         }

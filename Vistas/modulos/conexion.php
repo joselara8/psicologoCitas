@@ -1,7 +1,7 @@
 <?php
 include("configuracion.php");
 
-$enlace = mysqli_connect($servidor, $usuario, $clave, $bd);
+$enlace = mysqli_connect($servidor, $usuario, $clave, $bd, 3307);
 
 if (mysqli_connect_errno()) {
     echo "No conectado: ", mysqli_connect_error();

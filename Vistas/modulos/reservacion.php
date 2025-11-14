@@ -1,3 +1,7 @@
+<?php
+include("conexion.php");
+?>
+
 <div class="content-wrapper">
     <!-- Content Header -->
     <section class="content-header">
@@ -9,9 +13,9 @@
                 </div>
                 <div class="col-md-6">
                     <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="inicio">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="inicio">Inicio</a></li>
                         <li class="breadcrumb-item"><a href="Servicios">Servicios</a></li>
-                        <li class="breadcrumb-item"><a href="contact">Contactanos</a></li>
+                        <li class="breadcrumb-item"><a href="contact">Contáctanos</a></li>
                         <li class="breadcrumb-item active">Reservaciones</li>
                     </ol>
                 </div>
@@ -29,65 +33,104 @@
                             <h3 class="card-title">Reserva tu Cita</h3>
                         </div>
                         <div class="card-body">
-                            <form action="procesar_cita.php" method="POST">
-                                <!-- Nombre -->
+                            <form method="POST">
                                 <div class="form-group">
                                     <label for="nombre">Nombre Completo:</label>
                                     <input type="text" class="form-control" id="nombre" name="nombre" required>
                                 </div>
 
-                                <!-- Teléfono -->
                                 <div class="form-group">
-                                 <label for="telefono">Teléfono:</label>
-                                 <input type="tel" class="form-control" id="telefono" name="telefono" 
-                                    pattern="[0-9]{10}" placeholder="Ejemplo: (***)-***-****" required>
+                                    <label for="telefono">Teléfono:</label>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" pattern="[0-9]{10}" placeholder="Ejemplo: 1234567890" required>
                                 </div>
 
-                                <!-- Tipo de Servicio -->
                                 <div class="form-group">
-                                    <label for="servicio">Selecciona el Servicio:</label>
-                                    <select class="form-control" id="servicio" name="servicio" required>
-                                        <option value="Psicología">Psicología</option>
-                                        <option value="Fisioterapia">Fisioterapia</option>
+                                    <label for="fecha">Selecciona la Fecha:</label>
+                                    <input type="date" class="form-control" id="fecha" name="fecha" min="<?php echo date('Y-m-d'); ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="hora">Selecciona la Hora:</label>
+                                    <select class="form-control" id="hora" name="hora" required>
+                                        <option value="09:00">9:00 AM</option>
+                                        <option value="10:00">10:00 AM</option>
+                                        <option value="11:00">11:00 AM</option>
+                                        <option value="12:00">12:00 PM</option>
+                                        <option value="13:00">1:00 PM</option>
+                                        <option value="14:00">2:00 PM</option>
+                                        <option value="15:00">3:00 PM</option>
+                                        <option value="16:00">4:00 PM</option>
                                     </select>
                                 </div>
 
-                                <!-- Fecha -->
-                                <div class="form-group">
-                                    <label for="fecha">Selecciona la Fecha:</label>
-                                    <input type="date" class="form-control" id="fecha" name="fecha" required>
-                                </div>
-
-                                <!-- Hora -->
-                                <div class="form-group">
-    <label for="hora">Selecciona la Hora:</label>
-    <select class="form-control" id="hora" name="hora" required>
-        <option value="09:00">9:00 AM</option>
-        <option value="10:00">10:00 AM</option>
-        <option value="11:00">11:00 AM</option>
-        <option value="12:00">12:00 PM</option>
-        <option value="13:00">1:00 PM</option>
-        <option value="14:00">2:00 PM</option>
-        <option value="15:00">3:00 PM</option>
-        <option value="16:00">4:00 PM</option>
-    </select>
-</div>
-
-                                <!-- Mensaje Opcional -->
                                 <div class="form-group">
                                     <label for="mensaje">Mensaje (Opcional):</label>
                                     <textarea class="form-control" id="mensaje" name="mensaje" rows="3"></textarea>
                                 </div>
 
-                                <!-- Botón de Enviar -->
-                                <button type="submit" class="btn btn-success">
+                                <button type="submit" name="agendar" class="btn btn-success">
                                     <i class="fas fa-calendar-check"></i> Agendar Cita
                                 </button>
                             </form>
                         </div>
                     </div>
+
+                    <?php
+                    if (isset($_POST['agendar'])) {
+                        $nombre = mysqli_real_escape_string($enlace, $_POST['nombre']);
+                        $telefono = mysqli_real_escape_string($enlace, $_POST['telefono']);
+                        $fecha = mysqli_real_escape_string($enlace, $_POST['fecha']);
+                        $hora = mysqli_real_escape_string($enlace, $_POST['hora']);
+                        $mensaje = mysqli_real_escape_string($enlace, $_POST['mensaje']);
+
+                        date_default_timezone_set('America/Mexico_City');
+                        $fecha_actual = date('Y-m-d');
+                        $hora_actual = date('H:i');
+
+                        if ($fecha < $fecha_actual) {
+                            echo "<script>alert('No puedes agendar citas en fechas pasadas.'); window.history.back();</script>";
+                            exit;
+                        }
+
+                        if ($fecha == $fecha_actual && $hora <= $hora_actual) {
+                            echo "<script>alert('La hora seleccionada ya pasó. Elige una hora válida.'); window.history.back();</script>";
+                            exit;
+                        }
+
+                        $stmt = $enlace->prepare("SELECT idCitas FROM cita WHERE Fecha = ? AND Hora = ?");
+                        $stmt->bind_param("ss", $fecha, $hora);
+                        $stmt->execute();
+                        $resultado = $stmt->get_result();
+
+                        if ($resultado->num_rows > 0) {
+                            echo "<script>alert('Ya hay una cita en esa fecha y hora.'); window.location.href='reservacion';</script>";
+                            exit;
+                        } else {
+                            $stmt = $enlace->prepare("INSERT INTO cita (Nombre, Telefono, Fecha, Hora, Comentario) VALUES (?, ?, ?, ?, ?)");
+                            $stmt->bind_param("sssss", $nombre, $telefono, $fecha, $hora, $mensaje);
+                            if ($stmt->execute()) {
+                                echo "
+                                <div class='alert alert-success mt-4'>
+                                    <h4 class='alert-heading'>¡Cita agendada exitosamente!</h4>
+                                    <p><strong>Nombre:</strong> $nombre</p>
+                                    <p><strong>Teléfono:</strong> $telefono</p>
+                                    <p><strong>Fecha de la cita:</strong> $fecha</p>
+                                    <p><strong>Hora:</strong> $hora</p>";
+                                if (!empty($mensaje)) {
+                                    echo "<p><strong>Mensaje:</strong> $mensaje</p>";
+                                }
+                                echo "</div>";
+                            } else {
+                                echo "<script>alert('Hubo un error al agendar la cita.'); window.location.href='reservacion';</script>";
+                            }
+                        }
+                    }
+                    ?>
                 </div>
             </div>
         </div>
     </section>
 </div>
+
+<!-- FontAwesome (íconos) y Bootstrap (opcional si no está en AdminLTE ya) -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>

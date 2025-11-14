@@ -9,7 +9,7 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="Vistas/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="Vistas/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="Vistas/dist/css/adminlte.css">
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -21,12 +21,14 @@
     if ($_GET["ruta"] == "inicio" ||
         $_GET["ruta"] == "Servicios"||
         $_GET["ruta"] == "loginClientes"||
+        $_GET["ruta"] == "administradorPsicologo"||
         $_GET["ruta"] == "registro"||
+        $_GET["ruta"] == "subirExpediente"||
+        $_GET["ruta"] == "expedientes"||
+        $_GET["ruta"] == "expediente"||
         $_GET["ruta"] == "contact"||
         $_GET["ruta"] == "reservacion"||
         $_GET["ruta"] == "inicio"
-
-
     ){
       include "modulos/".$_GET["ruta"].".php";
     }
@@ -40,7 +42,7 @@
   } 
  // include "Vistas/modulos/inicio.php";
  // include "Vistas/modulos/404.php";
-  include "Vistas/modulos/pie.php";
+
 
   ?>
   <!-- Content Wrapper. Contains page content -->
